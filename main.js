@@ -1,16 +1,24 @@
 const port = 3000;
 http = require("http");
-httpStatus = require("http-status-codes");
+httpStatusCodes = require("http-status-codes");
+router = require("./router");
+fs = require("fs");
 
-app = http.createServer();
+htmlContentType = {
+    "Content-Type": "text/html"
+},
 
-app.on("request", (req, res) => {
-    console.log(req.url);
-    res.writeHead(httpStatus.OK, {
-        "Content-Type": "text/html"
+customReadFile = (file, res) => {
+    fs.readFile(`./${file}`, (errors, data) => {
+        if (errors) {
+            console.log("Error reading the file...");
+        }
+        res.end(data);
     });
-    let responseMessage = "<h1>Willkommen beim Sprint01!</h1>";
-    res.end(responseMessage);
+};
+router.get("/", (req, res) => {
+    res.writeHead(httpStatusCodes.OK, htmlContentType);
+    customReadFile("views/index.html", res);
 });
 
-app.listen(port);
+http.createServer(router.handle).listen(port);
